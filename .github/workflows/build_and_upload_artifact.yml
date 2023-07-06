@@ -47,7 +47,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           file: package/docker/Dockerfile
           push: true
-          tags: iplit/abha-verification:${{env.ARTIFACT_VERSION}},iplit/abha-verification:latest
+          tags: infoiplitin/abha-verification:${{env.ARTIFACT_VERSION}},iplit/abha-verification:latest
       - name: Helm - Update Version and Image Tag
         run: |
           yq --inplace '.image.tag = "${{ env.ARTIFACT_VERSION }}"' $HELM_CHART_PATH/values.yaml
