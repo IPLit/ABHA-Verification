@@ -7,7 +7,7 @@ const AadhaarConsent = (props) => {
 
     const [userName, setUserName] = useState(undefined);
     const [aadhaarConsent, setAadhaarConsent] = useState(
-        [true ,true ,true ,true ,false ,false]
+        [false ,false ,false ,false ,false ,false]
     );
     const [beneficiary, setBeneficiary] = useState('');
     const [error, setError] = useState(false);
