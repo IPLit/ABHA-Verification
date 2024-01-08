@@ -39,11 +39,21 @@
 }
 
 .demo-auth-form-field {
-    input, select {
-        padding: 2px;
+    .date-picker {
+        width: 100%;
     }
 
-    .label:after {
+    .dob-label {
+        width: 30%;
+        margin-right: 2%;
+    }
+
+    input, select {
+        padding: 2px;
+        margin-right: 4%;
+    }
+
+    .required-label:after {
         content:" *";
         color: red;
     }
