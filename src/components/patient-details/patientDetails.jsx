@@ -10,8 +10,10 @@ import ABHACard from "../creation/ABHACard";
 const PatientDetails = (props) => {
     const [selectedPatient, setSelectedPatient] = useState({});
     const [patients, setPatients] = useState([]);
+    const [showABHACard, setShowABHACard] = useState(false);
 
     const ndhmDetails = props.ndhmDetails;
+    const enableABHACardView = props.enableABHACardView;
 
     useEffect(() => {
         if(ndhmDetails?.uuid === undefined || ndhmDetails?.uuid === "") {
@@ -53,14 +55,20 @@ const PatientDetails = (props) => {
         save(true);
     }
 
+    function concatCountryCode(phoneNumber) {
+        if(phoneNumber.startsWith("+91")){
+            return phoneNumber;
+        }
+        return "+91".concat(phoneNumber);
+    }
+
     function getPhoneNumber() {
         if(ndhmDetails.phoneNumber){
-            return ndhmDetails.phoneNumber;
+            return concatCountryCode(ndhmDetails.phoneNumber);
         }
         else if(ndhmDetails?.identifiers !== undefined && ndhmDetails?.identifiers.length > 0){
             var phoneNumber = ndhmDetails?.identifiers[0].value;
-            var len = phoneNumber.length;
-            return "+91".concat(phoneNumber.substring(len-10,len));
+            return concatCountryCode(phoneNumber);
         }
         return null;
     }
@@ -108,9 +116,11 @@ const PatientDetails = (props) => {
                 <div className={checkIfNotNull(selectedPatient) ? 'greyed-out' : ''}>
                     <b>ABDM Record: </b>
                     <PatientInfo patient={ndhmDetails}/><br/>
-                    {!props.isVerifyABHAThroughFetchModes && props.isVerifyABHAThroughFetchModes !== undefined &&
+                    {enableABHACardView &&
+                    <div className='center'><button onClick={()=> setShowABHACard(true)} disabled={showABHACard}>Get ABHA Card</button></div>}
+                    {showABHACard &&
                     <div className="abha-card">
-                        <ABHACard  healthIdNumber={ndhmDetails?.healthIdNumber}/>
+                        <ABHACard  healthIdNumber={ndhmDetails?.healthIdNumber || ndhmDetails?.id} isVerifyByAbhaAddress={props.isVerifyByAbhaAddress}/>
                     </div>}
                     {patients.length === 0 && <b>No Bahmni Record Found</b>}
                     {patients.length > 0 && ndhmDetails.uuid == undefined &&
@@ -142,6 +152,8 @@ export default PatientDetails;
 export const getHealthNumber = (ndhmDetails) => {
     if(ndhmDetails?.healthIdNumber)
         return ndhmDetails?.healthIdNumber;
+    if(ndhmDetails?.abhaNumber)
+        return ndhmDetails?.abhaNumber;
     let healthNumber;
     if(ndhmDetails?.identifiers !== undefined) {
         ndhmDetails?.identifiers.forEach(id => {

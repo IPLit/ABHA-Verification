@@ -97,14 +97,14 @@ const LinkABHAAddress = (props) => {
         <div>
             {!createNewABHA && !link && !proceed &&
             <div>
-                {patient.phrAddress === undefined &&
+                {(patient.phrAddress === undefined || patient.phrAddress.length === 0) &&
                 <div className="no-abha-address">
                  <p className="note">You don't have ABHA Address/ Health Id linked to your ABHA Number</p>
                  <p className="note">
                      {isLinkingEnabled && <> Please proceed with linking the ABHA address that is already mapped to the mobile number or email, or </>}
                  create a new ABHA address</p>
                     {!isLinkingEnabled &&
-                        <CreateABHAAddress setBack={setBack} newAbhaAddress={newAbhaAddress} setNewAbhaAddress={setNewAbhaAddress} setABHAAddressCreated={setABHAAddressCreated} showCreateDefaultOption={true}/>
+                        <CreateABHAAddress setBack={setBack} newAbhaAddress={newAbhaAddress} setNewAbhaAddress={setNewAbhaAddress} setABHAAddressCreated={setABHAAddressCreated} />
                     }
                 </div>}
                 {patient.phrAddress !== undefined &&
@@ -133,7 +133,7 @@ const LinkABHAAddress = (props) => {
              <CreateABHAAddress setBack={setBack} newAbhaAddress={newAbhaAddress} setNewAbhaAddress={setNewAbhaAddress} setABHAAddressCreated={setABHAAddressCreated} />
             }
             {link && <VerifyMobileEmail patient={patient} setBack={setBack} mappedPatient={props.mappedPatient}/>}
-            {proceed && <PatientDetails ndhmDetails={props.mappedPatient} setBack={ !abhaAddressCreated ? setBack : undefined}/>}
+            {proceed && <PatientDetails ndhmDetails={props.mappedPatient} setBack={ !abhaAddressCreated ? setBack : undefined} enableABHACardView={true}/>}
         </div>
     );
 }

@@ -9,7 +9,7 @@
 
   .abha-creation-otp-verify {
     display: flex;
-    padding-top: 30px;
+    padding-top: 20px;
   }
   .select-option {
     padding-top: 20px;
@@ -51,6 +51,10 @@
     margin-left: 40%;
     margin-top: 5%
   }
+  .input-and-label {
+    display: flex;
+    padding-bottom: 20px;
+  }
 }
 
 button {
@@ -80,6 +84,11 @@ button:disabled {
   font-size: medium;
   font-style: italic;
   margin-top: 10px;
+}
+
+.validation-rule {
+  font-size: smaller;
+  font-style: italic;
 }
 
 .note {

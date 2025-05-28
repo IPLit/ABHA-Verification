@@ -15,29 +15,31 @@ export const existingPatientUrl = "/existingPatients";
 export const existingPatientWithUuid = "/existingPatientWithUuid";
 export const ndhmDemographics = "/v0.5/hip/ndhm-demographics";
 export const authToken = "/v0.5/hip/auth/demographics";
-export const patientProfileFetch ="/v0.5/patients/profile/fetch";
-export const generateAadhaarOtp = "/v2/registration/aadhaar/generateOtp"
-export const verifyAadhaarOtp = "/v2/registration/aadhaar/verifyOTP"
-export const checkAndGenerateMobileOtp = "/v2/registration/aadhaar/checkAndGenerateMobileOTP"
-export const verifyMobileOTP = "/v2/registration/aadhaar/verifyMobileOTP"
-export const createHealthIdByAdhaar = "/v2/registration/aadhaar/createHealthIdByAdhaar"
-export const getPngCard = "/v2/account/getPngCard";
-export const searchHealthId = "/v2/search/searchHealthIdToLogin"
-export const healthIdAuthInit = "/v2/auth/init"
-export const healthIdConfirmOtp = "/v2/hip/confirmOTP"
+export const fetchPatientQueue ="/v3/hip/getPatientQueue";
+export const generateAadhaarOtp = "/v3/hip/generateAadhaarOtp"
+export const verifyAadhaarOtpAndCreateABHA = "/v3/hip/verifyOtpAndCreateABHA"
+export const generateABHAMobileOTP = "/v3/hip/generateMobileOtp"
+export const verifyMobileOTP = "/v3/hip/verifyMobileOtp"
+export const getAbhaAddressSuggestions = "/v3/hip/getAbhaAddressSuggestions"
+export const getPngCard = "/v3/hip/getAbhaCard";
+export const searchAbhaAddress = "/v3/hip/verification/abhaAddress/search";
+export const abhaAddressVerificationRequestOtp = "/v3/hip/verification/abhaAddress/requestOtp";
+export const abhaAddressVerificationVerifyOtp = "/v3/hip/verification/abhaAddress/verifyOtp";
+export const abhaAddressVerificationGetProfile = "/v3/hip/verification/abhaAddress/getProfile";
+export const abhaAddressVerificationGetCard = "/v3/hip/verification/abhaAddress/getCard";
 export const createDefaultHealthId = "/v1/account/update/phr-address"
 export const updateHealthId = "/v2/hip/profile/updatePhrAddress"
-export const generateMobileOtp = "/v2/registration/mobile/login/generateOtp"
-export const verifyMobileOtp = "/v2/registration/mobile/login/verifyOtp"
-export const getPatientProfileInfo = "/v2/registration/mobile/login/userAuthorizedToken"
+export const verificationRequestOtp = "/v3/hip/verification/requestOtp"
+export const verificationVerifyOtp = "/v3/hip/verification/verifyOtp"
+export const verifyAbhaAccount= "/v3/hip/verification/verifyAbhaAccount"
+export const getPatientProfileInfo = "/v3/hip/verification/getAbhaProfile"
 export const mobileEmailInit = "/v1/phr/login/mobileEmail/init";
 export const mobileEmailPreverification = "/v1/phr/login/mobileEmail/preVerification";
 export const getUserToken = "/v1/phr/login/mobileEmail/getUserToken";
 export const linkABHAAddress = "/v1/phr/profile/link/hid";
 export const authMethods = "/v1/phr/registration/hid/search/auth-methods";
 export const transaction = "/v1/phr/login/init/transaction";
-export const createABHAAddress = "/v2/account/phr-linked";
-export const checkIfABHAAddressExists = "/v1/phr/search/isExist"
+export const createABHAAddress = "/v3/hip/createAbhaAddress";
 export const openmrsSession = "/openmrs/ws/rest/v1/session"
 export const globalPropertyUrl = "/openmrs/ws/rest/v1/bahmnicore/sql/globalproperty"
 export const cmSuffixProperty = 'bahmniHip.CM_SUFFIX'
@@ -48,6 +50,16 @@ export const enableLinkABHAAddress = 'bahmniHip.enableLinkABHAAddress'
 export const serviceUnavailableError = {
     "error": {
         "message": "Service Unavailable. Please try again later"
+    }
+}
+export const abhaAddressUnavailableError = {
+    "error": {
+        "message": "Please enter ABHA Address."
+    }
+}
+export const inactiveAbhaAddressError = {
+    "error": {
+        "message": "Abha address is not active."
     }
 }
 export const invalidHealthId = {
@@ -74,3 +86,4 @@ export const openMrsDown = {
         "message": "OpenMRS-REST is Unhealthy,OpenMRS-FHIR is Unhealthy"
     }
 }
+export const activeStatus = "ACTIVE"
