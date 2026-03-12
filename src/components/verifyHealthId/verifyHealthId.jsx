@@ -253,7 +253,7 @@ const VerifyHealthId = () => {
                                 <option value=''>Select Identifier Type</option>
                                 <option value="ABHA_NUMBER">ABHA Number</option>
                                 <option value="ABHA_ADDRESS">ABHA Address</option>
-                                {isVerifyThroughMobileNumberEnabled && <option value="MOBILE_NUMBER">Mobile Number</option> }
+                                <option value="MOBILE_NUMBER">Mobile Number</option>
                                 <option value="AADHAAR_NUMBER">Aadhaar Number</option>
                             </select>
                         </div>

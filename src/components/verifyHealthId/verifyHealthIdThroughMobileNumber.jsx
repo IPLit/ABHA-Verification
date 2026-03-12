@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {
     fetchPatientFromBahmniWithHealthId,
-    getPatientProfile,
-    mobileGenerateOtp,
-    mobileVerifyOtp,
-    verifyAbhaAccount
+    searchAbhaByMobile,
+    profileLoginRequestOtp,
+    profileLoginVerify
 } from '../../api/hipServiceApi';
 import Spinner from '../spinner/spinner';
 import './verifyHealthId.scss';
@@ -27,6 +26,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
     const [error, setError] = useState('');
     const [selectedABHA, setSelectedABHA] = useState({});
     const [showResendSuccessMessage, setShowResendSuccessMessage] = useState(false);
+    const [searchTxnId, setSearchTxnId] = useState('');
 
     function idOnChangeHandler(e) {
         setShowError(false);
@@ -41,18 +41,8 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
 
     async function onResendOtp() {
         setError("");
-        setLoader(true);
         setShowError(false);
-        var response = await mobileGenerateOtp(mobileNumber) ;
-        setLoader(false);
-        if (response.error) {
-            setShowError(true);
-            setError(response.error.message);
-        }
-        else{
-            setShowResendSuccessMessage(true);
-            setTimeout(()=>{setShowResendSuccessMessage(false);},3000)
-        }
+        await requestOtpForSelectedAbha(true);
     }
 
     async function verifyMobileNumber() {
@@ -65,14 +55,15 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
         setError('');
         setLoader(true);
         setShowError(false);
-        const response = await mobileGenerateOtp(mobileNumber);
-        if (response.data !== undefined) {
-            setShowOtpInput(true);
+        const response = await searchAbhaByMobile(formattedMobileNumber);
+        if (response && response.data !== undefined) {
+            const abhaList = response.data.abhaList || [];
+            setLinkedABHANumber(abhaList);
+            setSearchTxnId(response.data.txnId || '');
             props.setIsDisabled(true);
-        }
-        else {
+        } else {
             setShowError(true);
-            setError(response.error.message);
+            setError(response?.error?.message);
         }
         setLoader(false);
     }
@@ -85,23 +76,16 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             setError("Invalid OTP. OTP should be 6 digits");
         } else {
             setLoader(true);
-            var response = await mobileVerifyOtp(otp);
-            if(response){
-                setLoader(false);
-                if(response.data === undefined){
-                    setShowError(true);
-                    setError(response.error.message);
-                }
-                else {
-                    if (response.data.authResult === "success") {
-                        props.setIsMobileOtpVerified(true);
-                        setLinkedABHANumber(response.data.accounts);
-                    }
-                    else{
-                        setShowError(true);
-                        setError(response.data.message);
-                    }
-                    
+            const response = await profileLoginVerify(otp, searchTxnId);
+            setLoader(false);
+            if (!response || response.data === undefined) {
+                setShowError(true);
+                setError(response?.error?.message || "Unable to verify OTP. Please try again.");
+            }
+            else {
+                props.setIsMobileOtpVerified(true);
+                if (response.data) {
+                    props.setNdhmDetails(mapPatient(response.data));
                 }
             }
         }
@@ -117,8 +101,9 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 <button onClick={() => setSelectedABHA(linkedABHANumber[i])} className={selectedABHA === patient ? "active" : "abha-list"}>
                     <p>
                         <strong>{patient?.name?.replace(null,"")} </strong>
-                        {patient?.preferredAbhaAddress !== "" && <span><br/>ABHA Address: {patient?.preferredAbhaAddress}</span>}
+                        {patient?.gender && <span><br/>Gender: {patient.gender}</span>}
                          <span><br/>ABHA Number: {patient.abhaNumber}</span>
+                        {patient?.index !== undefined && <span><br/>Index: {patient.index}</span>}
                     </p>
                 </button>
             );
@@ -147,42 +132,31 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
         }
     },[selectedABHA])
 
-    async function getABHAProfile() {
-        setError('');
-        setShowError(false);
-        setLoader(true);
-        const response = await getPatientProfile();
-        if (response) {
-            setLoader(false);
-            if (response.data === undefined) {
-                setShowError(true);
-                setError(response.error.message);
-            }
-            else {
-                props.setNdhmDetails(mapPatient(response.data));
-            }
-        }
-    }
-
-    async function verifyingAbhaAccount() {
-        setError('');
-        setLoader(true);
-        setShowError(false);
-
-        try {
-            const response = await verifyAbhaAccount(selectedABHA.abhaNumber);
-            console.log(response.data);
-            if (response.data !== undefined) {
-                await getABHAProfile();
-            } else {
-                setShowError(true);
-                setError(response.error.message);
-            }
-        } catch (error) {
+    async function requestOtpForSelectedAbha(isResend = false) {
+        if (!checkIfNotNull(selectedABHA)) {
             setShowError(true);
-            setError(error.message || "An error occurred while verifying the account.");
-        } finally {
-            setLoader(false);
+            setError("Please select an ABHA ID from the list.");
+            return;
+        }
+        if (!searchTxnId) {
+            setShowError(true);
+            setError("Search transaction is missing. Please search again.");
+            return;
+        }
+        setError('');
+        setLoader(true);
+        setShowError(false);
+        const response = await profileLoginRequestOtp(selectedABHA.index, searchTxnId);
+        setLoader(false);
+        if (!response || response.data === undefined) {
+            setShowError(true);
+            setError(response?.error?.message || "Unable to send OTP. Please try again.");
+        } else {
+            setShowOtpInput(true);
+            if (isResend) {
+                setShowResendSuccessMessage(true);
+                setTimeout(()=>{setShowResendSuccessMessage(false);},3000);
+            }
         }
     }
 
@@ -212,26 +186,10 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                             <div className="verify-health-id-input">
                                 <input type="text" id="mobileNumber" name="mobileNumber" value={mobileNumber} onChange={idOnChangeHandler} />
                             </div>
-                            <button name="verify-btn" type="button" onClick={verifyMobileNumber} disabled={props.isDisabled || showOtpInput}>Verify</button>
+                            <button name="verify-btn" type="button" onClick={verifyMobileNumber} disabled={props.isDisabled || showOtpInput}>Search</button>
                             {!showOtpInput && showError && <h6 className="error ">{error}</h6>}
                         </div>
                     </div>
-                    {showOtpInput &&
-                        <div>
-                    <div className="otp-verify" >
-                        <label htmlFor="otp">Enter OTP </label>
-                        <div className="otp-verify-input-btn" >
-                            <div className="otp-verify-input">
-                                <input type="text" id="otp" name="otp" value={otp} onChange={otpOnChangeHandler} />
-                            </div>
-                            <ResendOtp onResend={onResendOtp} />
-                            {showResendSuccessMessage && <div className="success_text">OTP Sent Successfully</div>}
-                            {showError && <h6 className="error ">{error}</h6>}
-                        </div>
-                    </div>
-                            <div className="qr-code-scanner"> <button type="button" onClick={verifyOtp}>Confirm</button></div>
-                        </div>
-                    }
                     {loader && <Spinner />}
                 </div>}
                 {linkedABHANumber.length > 0 &&
@@ -245,9 +203,25 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                         ABHA Number doesn't have ABHA Address linked.
                         Click on proceed to create new ABHA Address.
                     </div>}
+                    {showOtpInput &&
+                        <div>
+                            <div className="otp-verify" >
+                                <label htmlFor="otp">Enter OTP </label>
+                                <div className="otp-verify-input-btn" >
+                                    <div className="otp-verify-input">
+                                        <input type="text" id="otp" name="otp" value={otp} onChange={otpOnChangeHandler} />
+                                    </div>
+                                    <ResendOtp onResend={onResendOtp} />
+                                    {showResendSuccessMessage && <div className="success_text">OTP Sent Successfully</div>}
+                                    {showError && <h6 className="error ">{error}</h6>}
+                                </div>
+                            </div>
+                            <div className="qr-code-scanner"> <button type="button" onClick={verifyOtp}>Verify OTP &amp; Fetch Profile</button></div>
+                        </div>
+                    }
                     <div className="create-confirm-btns">
                         {props.setBack !== undefined && <button onClick={() => setBack(true)}>Back</button>}
-                        {checkIfNotNull(selectedABHA) && !matchingPatientFound && <button onClick={verifyingAbhaAccount}> {isHealthIdNotLinked ? "Proceed" : "Confirm"} </button>}
+                        {checkIfNotNull(selectedABHA) && !showOtpInput && <button onClick={() => requestOtpForSelectedAbha(false)}>Send OTP</button>}
                     </div>
                     {showError && <h6 className="error-msg">{error}</h6>}
                     {loader && <Spinner />}

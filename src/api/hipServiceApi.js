@@ -557,6 +557,57 @@ export const mobileVerifyOtp = async (otp) => {
     }
 };
 
+export const searchAbhaByMobile = async (mobileNumber) => {
+    const data = {
+        "scope": ["search-abha"],
+        "mobile": mobileNumber
+    };
+    try {
+        const response = await axios.post(Constants.hipServiceUrl + Constants.searchAbhaByMobile, data, Constants.headers);
+        return response;
+    }
+    catch (error) {
+        return parseAPIError(error);
+    }
+};
+
+export const profileLoginRequestOtp = async (index, txnId) => {
+    const data = {
+        "scope": ["abha-login", "search-abha", "mobile-verify"],
+        "loginHint": "index",
+        "loginId": index?.toString(),
+        "otpSystem": "abdm",
+        "txnId": txnId
+    };
+    try {
+        const response = await axios.post(Constants.hipServiceUrl + Constants.profileLoginRequestOtp, data, Constants.headers);
+        return response;
+    }
+    catch (error) {
+        return parseAPIError(error);
+    }
+};
+
+export const profileLoginVerify = async (otp, txnId) => {
+    const data = {
+        "scope": ["abha-login", "mobile-verify"],
+        "authData": {
+            "authMethods": ["otp"],
+            "otp": {
+                "txnId": txnId,
+                "otpValue": otp
+            }
+        }
+    };
+    try {
+        const response = await axios.post(Constants.hipServiceUrl + Constants.profileLoginVerify, data, Constants.headers);
+        return response;
+    }
+    catch (error) {
+        return parseAPIError(error);
+    }
+};
+
 export const verifyAbhaAccount = async (abhaNumber) => {
     const data = {
         "abhaNumber": abhaNumber
