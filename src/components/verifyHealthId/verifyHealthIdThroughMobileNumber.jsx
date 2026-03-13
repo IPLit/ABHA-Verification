@@ -3,7 +3,8 @@ import {
     fetchPatientFromBahmniWithHealthId,
     searchAbhaByMobile,
     profileLoginRequestOtp,
-    profileLoginVerify
+    profileLoginVerify,
+    getPatientProfile
 } from '../../api/hipServiceApi';
 import Spinner from '../spinner/spinner';
 import './verifyHealthId.scss';
@@ -76,16 +77,20 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             setError("Invalid OTP. OTP should be 6 digits");
         } else {
             setLoader(true);
-            const response = await profileLoginVerify(otp, searchTxnId);
-            setLoader(false);
-            if (!response || response.data === undefined) {
+            const verifyResponse = await profileLoginVerify(otp, searchTxnId);
+            if (!verifyResponse || verifyResponse.data === undefined) {
+                setLoader(false);
                 setShowError(true);
-                setError(response?.error?.message || "Unable to verify OTP. Please try again.");
-            }
-            else {
+                setError(verifyResponse?.error?.message || "Unable to verify OTP. Please try again.");
+            } else {
                 props.setIsMobileOtpVerified(true);
-                if (response.data) {
-                    props.setNdhmDetails(mapPatient(response.data));
+                const profileResponse = await getPatientProfile();
+                setLoader(false);
+                if (profileResponse && profileResponse.data !== undefined) {
+                    props.setNdhmDetails(mapPatient(profileResponse.data));
+                } else {
+                    setShowError(true);
+                    setError(profileResponse?.error?.message || "OTP verified, but failed to fetch profile. Please try again.");
                 }
             }
         }
