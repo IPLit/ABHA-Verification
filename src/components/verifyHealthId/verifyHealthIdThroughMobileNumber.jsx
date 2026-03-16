@@ -84,13 +84,9 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 setError(verifyResponse?.error?.message || "Unable to verify OTP. Please try again.");
             } else {
                 props.setIsMobileOtpVerified(true);
-                const profileResponse = await getPatientProfile();
                 setLoader(false);
-                if (profileResponse && profileResponse.data !== undefined) {
-                    props.setNdhmDetails(mapPatient(profileResponse.data));
-                } else {
-                    setShowError(true);
-                    setError(profileResponse?.error?.message || "OTP verified, but failed to fetch profile. Please try again.");
+                if (verifyResponse && verifyResponse.data !== undefined) {
+                    props.setNdhmDetails(mapPatient(verifyResponse.data));
                 }
             }
         }

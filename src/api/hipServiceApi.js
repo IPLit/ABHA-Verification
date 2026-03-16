@@ -590,7 +590,7 @@ export const profileLoginRequestOtp = async (index, txnId) => {
 
 export const profileLoginVerify = async (otp, txnId) => {
     const data = {
-        "scope": ["abha-login", "search-abha", "mobile-verify"],
+        "scope": ["abha-login", "mobile-verify"],
         "authData": {
             "authMethods": ["otp"],
             "otp": {
