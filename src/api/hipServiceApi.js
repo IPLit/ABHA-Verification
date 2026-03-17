@@ -1,6 +1,24 @@
 import axios from 'axios';
 import * as Constants from './constants';
 import { parseAPIError } from './apiUtils';
+
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+};
+
+axios.interceptors.request.use((config) => {
+    const correlationId = getCookie('reporting_session');
+    if (correlationId) {
+        config.headers = config.headers || {};
+        config.headers['CORRELATION-ID'] = correlationId;
+    }
+    return config;
+}, (error) => Promise.reject(error));
+
 export const getAuthModes = async (healthId) => {
     let error = isValidHealthId(healthId);
     if (error) {
