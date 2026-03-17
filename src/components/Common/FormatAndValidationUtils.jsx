@@ -15,5 +15,6 @@ export const validateOtp = (otp) => {
 }
 
 export const validateMobileNumber = (mobileNumber) => {
-    return /^\d{10}$/.test(mobileNumber);
+    // return /^\d{10}$/.test(mobileNumber);
+    return (/^\+91[1-9][0-9]{9}$/.test(mobileNumber) || /^\d{10}$/.test(mobileNumber));
 }

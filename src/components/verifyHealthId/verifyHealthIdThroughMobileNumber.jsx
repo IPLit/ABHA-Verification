@@ -195,7 +195,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 </div>}
                 {linkedABHANumber.length > 0 &&
                 <div>
-                    <h3>ABHA numbers found for the given mobile number. Please select one of the following</h3>
+                    <strong>ABHA numbers found for the given mobile number. Please select one of the following</strong>
                     {prepareMatchingPatientsList()}
                     {matchingPatientFound && <div className="patient-existed" onClick={redirectToPatientDashboard}>
                         Matching record with Health ID/PHR Address found
