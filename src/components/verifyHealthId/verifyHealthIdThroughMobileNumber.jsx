@@ -28,6 +28,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
     const [selectedABHA, setSelectedABHA] = useState({});
     const [showResendSuccessMessage, setShowResendSuccessMessage] = useState(false);
     const [searchTxnId, setSearchTxnId] = useState('');
+    const [otpTxnId, setOtpTxnId] = useState('');
 
     function idOnChangeHandler(e) {
         setShowError(false);
@@ -77,7 +78,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             setError("Invalid OTP. OTP should be 6 digits");
         } else {
             setLoader(true);
-            const verifyResponse = await profileLoginVerify(otp, searchTxnId);
+            const verifyResponse = await profileLoginVerify(otp, otpTxnId);
             if (!verifyResponse || verifyResponse.data === undefined) {
                 setLoader(false);
                 setShowError(true);
@@ -154,6 +155,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             setError(response?.error?.message || "Unable to send OTP. Please try again.");
         } else {
             setShowOtpInput(true);
+            setOtpTxnId(response.data.txnId || '');
             if (isResend) {
                 setShowResendSuccessMessage(true);
                 setTimeout(()=>{setShowResendSuccessMessage(false);},3000);
@@ -195,7 +197,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 </div>}
                 {linkedABHANumber.length > 0 &&
                 <div>
-                    <strong>ABHA numbers found for the given mobile number. Please select one of the following</strong>
+                    <h4>ABHA numbers found for the given mobile number. Please select one of the following</h4>
                     {prepareMatchingPatientsList()}
                     {matchingPatientFound && <div className="patient-existed" onClick={redirectToPatientDashboard}>
                         Matching record with Health ID/PHR Address found
