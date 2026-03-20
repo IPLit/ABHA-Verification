@@ -185,6 +185,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 ) {
                     setMatchingPatientFound(true);
                     setMatchingPatientUuid(matchingPatientId.patientUuid);
+                    setShowOtpInput(false);
                 } else {
                     if (matchingPatientId.Error !== undefined) {
                         setShowError(true);
@@ -202,15 +203,13 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             setMobileNumber('');
             setOtp('');
             setError('');
-            setShowOtpInput('');
+            setShowOtpInput(false);
             setLinkedABHANumber([]);
             setSelectedABHA({});
             props.setIsMobileOtpVerified(false);
             props.setBack(true);
         }
     },[back])
-
-
 
     return (
         <div>
@@ -231,7 +230,8 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                 </div>}
                 {linkedABHANumber.length > 0 &&
                 <div>
-                    <h4>ABHA numbers found for the given mobile number. Please select one of the following</h4>
+                    <h4><center>ABHA numbers found for the given mobile number.<br/>
+                                Please select one of the following</center></h4>
                     {prepareMatchingPatientsList()}
                     {matchingPatientFound && <div className="patient-existed" onClick={redirectToPatientDashboard}>
                         Matching record with Health ID/PHR Address found
