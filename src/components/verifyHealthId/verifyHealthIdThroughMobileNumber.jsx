@@ -86,8 +86,10 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             } else {
                 props.setIsMobileOtpVerified(true);
                 setLoader(false);
-                if (verifyResponse && verifyResponse.data !== undefined) {
-                    props.setNdhmDetails(mapPatient(verifyResponse.data));
+                if (verifyResponse.data.authResult === "success") await getABHAProfile();
+                else {
+                    setError(verifyResponse.data.message);
+                    setShowError(true);
                 }
             }
         }
@@ -159,6 +161,38 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
             if (isResend) {
                 setShowResendSuccessMessage(true);
                 setTimeout(()=>{setShowResendSuccessMessage(false);},3000);
+            }
+        }
+    }
+
+    async function getABHAProfile() {
+        setError("");
+        setShowError(false);
+        setLoader(true);
+        const response = await getPatientProfile();
+        if (response) {
+            setLoader(false);
+            if (response.data === undefined) {
+                setShowError(true);
+                setError(response.error.message);
+            } else {
+                const matchingPatientId = await fetchPatientFromBahmniWithHealthId(
+                    response.data.abhaNumber
+                );
+                if (
+                    matchingPatientId.Error === undefined &&
+                    matchingPatientId.validPatient === true
+                ) {
+                    setMatchingPatientFound(true);
+                    setMatchingPatientUuid(matchingPatientId.patientUuid);
+                } else {
+                    if (matchingPatientId.Error !== undefined) {
+                        setShowError(true);
+                        setError(matchingPatientId.Error.message);
+                    } else {
+                        props.setNdhmDetails(mapPatient(response.data));
+                    }
+                }
             }
         }
     }
