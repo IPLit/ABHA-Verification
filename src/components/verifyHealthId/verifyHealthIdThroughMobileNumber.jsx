@@ -258,7 +258,7 @@ const VerifyHealthIdThroughMobileNumber = (props) => {
                     }
                     <div className="create-confirm-btns">
                         {props.setBack !== undefined && <button onClick={() => setBack(true)}>Back</button>}
-                        {checkIfNotNull(selectedABHA) && !showOtpInput && <button onClick={() => requestOtpForSelectedAbha(false)}>Send OTP</button>}
+                        { !matchingPatientFound && checkIfNotNull(selectedABHA) && !showOtpInput && <button onClick={() => requestOtpForSelectedAbha(false)}>Send OTP</button>}
                     </div>
                     {showError && <h6 className="error-msg">{error}</h6>}
                     {loader && <Spinner />}
